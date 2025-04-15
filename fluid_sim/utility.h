@@ -7,8 +7,8 @@ private:
 public:
     Vec2(float x, float y);
     Vec2();
-	float getX() const { return x; }
-	float getY() const { return y; }
+    float getX() const;
+    float getY() const;
     void setX(float x);
     void setY(float y);
     Vec2 operator+(const Vec2& b) const;
