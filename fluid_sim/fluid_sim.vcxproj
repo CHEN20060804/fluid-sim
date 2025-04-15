@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ConsoleBuffer.h" />
+    <ClInclude Include="Particle.h" />
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
