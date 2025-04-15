@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <iostream>
 #include <vector>
 #include <Windows.h>
@@ -14,17 +14,13 @@ public:
     ConsoleBuffer() {
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-        // 1. ×î´ó»¯´°¿Ú
         HWND hwnd = GetConsoleWindow();
         ShowWindow(hwnd, SW_MAXIMIZE);
 
-        // 2. ÉèÖÃ×ÖÌå£¨¿ÉÑ¡£©
         SetConsoleFont();
 
-        // 3. »ñÈ¡Êµ¼Ê´°¿Ú³ß´ç£¨×¢Òâ£º±ØÐëÔÚ×î´ó»¯ºóÖ´ÐÐ£©
         UpdateWindowSize();
 
-        // 4. ³õÊ¼»¯»º³åÇø
         buffer = std::vector<std::wstring>(height, std::wstring(width, L' '));
     }
 
@@ -60,15 +56,12 @@ public:
             );
         }
     }
-
     int GetWidth() const {
         return width;
     }
-
     int GetHeight() const {
         return height;
     }
-
     void SetConsoleFont() {
         CONSOLE_FONT_INFOEX cfi = { sizeof(cfi) };
         cfi.dwFontSize.X = 8;
@@ -77,6 +70,11 @@ public:
         cfi.FontFamily = FF_DONTCARE;
         cfi.FontWeight = FW_NORMAL;
         SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
+    }
+    void SetPixel(int x, int y, wchar_t sign) {
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+            buffer[y][x] = sign; 
+        }
     }
 };
 
@@ -97,12 +95,12 @@ void DrawRectangleFrame(ConsoleBuffer& consoleBuffer, int& frameLeft, int& frame
 
     for (int y = 0; y < boxHeight; ++y) {
         for (int x = 0; x < boxWidth; ++x) {
-            if (y == 0 && x == 0) consoleBuffer.DrawAt(startX + x, startY + y, L'©°');
-            else if (y == 0 && x == boxWidth - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'©´');
-            else if (y == boxHeight - 1 && x == 0) consoleBuffer.DrawAt(startX + x, startY + y, L'©¸');
-            else if (y == boxHeight - 1 && x == boxWidth - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'©¼');
-            else if (y == 0 || y == boxHeight - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'©¤');
-            else if (x == 0 || x == boxWidth - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'©¦');
+            if (y == 0 && x == 0) consoleBuffer.DrawAt(startX + x, startY + y, L'â”Œ');
+            else if (y == 0 && x == boxWidth - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'â”');
+            else if (y == boxHeight - 1 && x == 0) consoleBuffer.DrawAt(startX + x, startY + y, L'â””');
+            else if (y == boxHeight - 1 && x == boxWidth - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'â”˜');
+            else if (y == 0 || y == boxHeight - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'â”€');
+            else if (x == 0 || x == boxWidth - 1) consoleBuffer.DrawAt(startX + x, startY + y, L'â”‚');
         }
     }
 }
@@ -129,4 +127,8 @@ bool IsRunningAsAdmin() {
         FreeSid(adminGroup);
     }
     return isAdmin;
+}
+
+void DrawAt(ConsoleBuffer& consoleBuffer, int x, int y, wchar_t sign) {
+    consoleBuffer.SetPixel(x, y, sign);  // å°†ç¬¦å·ç»˜åˆ¶åˆ°ç¼“å†²åŒºä¸­çš„æŒ‡å®šä½ç½®
 }

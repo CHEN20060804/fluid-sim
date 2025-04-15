@@ -1,8 +1,8 @@
 #include <chrono>
 #include <thread>
 #include "ConsoleBuffer.h"
-#include <locale>
-
+#include "utility.h"
+#define FPS 60
 
 int main() {
     std::wcout.imbue(std::locale(""));
@@ -25,13 +25,34 @@ int main() {
         }
         return 0;
     }
-    int frameLeft, frameTop, frameRight, frameBottom;
+    int frameLeft=0, frameTop=0, frameRight=0, frameBottom=0;
+    
+    auto lastDrawTime = std::chrono::steady_clock::now();
+
+    Vec2 position((frameLeft + frameRight) / 2, (frameTop + frameBottom) / 2);
+    Vec2 velocity(0, 0);
 
     while (true) {
-        consoleBuffer.Clear();
-        DrawRectangleFrame(consoleBuffer, frameLeft, frameTop, frameRight, frameBottom);
-        consoleBuffer.Render();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        auto currentTime = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed = currentTime - lastDrawTime;
+        if (elapsed.count() >= 1.0/FPS) {
+
+            consoleBuffer.Clear();
+            velocity += Vec2(0, 1.0f) * 5 * 1 / FPS;
+			position += velocity * 1 / FPS;
+			if (position.getY() > consoleBuffer.GetHeight() - 1) {
+				position.setY(consoleBuffer.GetHeight() - 1);
+				velocity.setY(-velocity.getY());
+			}
+			DrawAt(consoleBuffer, position.getX(), position.getY(), L'¡ñ');
+            DrawRectangleFrame(consoleBuffer, frameLeft, frameTop, frameRight, frameBottom);
+            consoleBuffer.Render();
+
+            lastDrawTime = currentTime;
+        }
+        else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
     return 0;
 }
