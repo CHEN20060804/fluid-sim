@@ -9,6 +9,7 @@ public:
     Vec2();
     Vec2 operator+(const Vec2& b) const;
     Vec2 operator-(const Vec2& b) const;
+    Vec2 operator-();
     Vec2 operator/(float s) const;
     Vec2 operator*(float s) const;
     Vec2& operator+=(const Vec2& b);
@@ -20,3 +21,5 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Vec2& vec);
 };
+
+Vec2 operator*(Vec2 v);

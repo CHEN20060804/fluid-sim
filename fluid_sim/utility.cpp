@@ -14,6 +14,11 @@ Vec2 Vec2::operator+(const Vec2& b) const {
 Vec2 Vec2::operator-(const Vec2& b) const {
     return Vec2(x - b.x, y - b.y);
 }
+// 负号运算符重载
+Vec2 Vec2::operator-(){
+	return Vec2(-x, -y);
+}
+
 
 // 除法运算符重载
 Vec2 Vec2::operator/(float s) const {
@@ -82,4 +87,9 @@ Vec2 Vec2::normalize() const {
 std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
 	os << "(" << vec.x << ", " << vec.y << ")";
 	return os;
+}
+
+//重载数乘运算符
+Vec2 operator*(Vec2 v, float s) {
+	return v.operator*(s);
 }
