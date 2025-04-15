@@ -1,0 +1,22 @@
+#pragma once
+#include <iostream>
+class Vec2 {
+private:
+    float x, y;
+
+public:
+    Vec2(float x, float y);
+    Vec2();
+    Vec2 operator+(const Vec2& b) const;
+    Vec2 operator-(const Vec2& b) const;
+    Vec2 operator/(float s) const;
+    Vec2 operator*(float s) const;
+    Vec2& operator+=(const Vec2& b);
+    Vec2& operator-=(const Vec2& b);
+	Vec2& operator*=(float s);
+	Vec2& operator/=(float s);
+	float length() const;
+	Vec2 normalize() const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Vec2& vec);
+};
