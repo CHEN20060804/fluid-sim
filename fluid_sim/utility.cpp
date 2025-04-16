@@ -98,6 +98,7 @@ std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
 }
 
 //ÖØÔØÊý³ËÔËËã·û
-Vec2 operator*(Vec2 v, float s) {
+Vec2 operator*(float s, Vec2 v) {
 	return v.operator*(s);
 }
+

@@ -26,3 +26,4 @@ public:
 };
 
 Vec2 operator*(Vec2 v);
+

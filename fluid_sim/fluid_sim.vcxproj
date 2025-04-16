@@ -130,11 +130,13 @@
     <ClInclude Include="ConsoleBuffer.h" />
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="Particle.h" />
+    <ClInclude Include="SPH.h" />
     <ClInclude Include="utility.h" />
     <ClInclude Include="XPBD.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Integrator.cpp" />
+    <ClCompile Include="SPH.cpp" />
     <ClCompile Include="utility.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="XPBD.cpp" />
