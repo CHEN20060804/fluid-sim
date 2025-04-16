@@ -11,32 +11,54 @@ private:
     HANDLE hConsole;
 
 public:
+    //ConsoleBuffer() {
+    //    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    //    HWND hwnd = GetConsoleWindow();
+    //    ShowWindow(hwnd, SW_MAXIMIZE);
+
+    //    SetConsoleFont();
+
+    //    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    //    GetConsoleScreenBufferInfo(hConsole, &csbi);
+
+    //    COORD largestSize = GetLargestConsoleWindowSize(hConsole);
+
+    //    // 设置窗口缓冲区为最大可见尺寸
+    //    SetConsoleScreenBufferSize(hConsole, largestSize);
+
+    //    // 设置窗口矩形为满缓冲区大小
+    //    SMALL_RECT windowSize = { 0, 0, largestSize.X - 1, largestSize.Y - 1 };
+    //    SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
+
+    //    // 更新本地记录的宽高
+    //    width = largestSize.X;
+    //    height = largestSize.Y;
+
+    //    // 初始化缓冲区
+    //    buffer = std::vector<std::wstring>(height, std::wstring(width, L' '));
+    //}
     ConsoleBuffer() {
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-        HWND hwnd = GetConsoleWindow();
-        ShowWindow(hwnd, SW_MAXIMIZE);
-
         SetConsoleFont();
 
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        GetConsoleScreenBufferInfo(hConsole, &csbi);
+        // 设置窗口和缓冲区尺寸
+        const SHORT windowWidth = 120;
+        const SHORT windowHeight = 50;
+        const SHORT bufferHeight = 3000;
 
-        COORD largestSize = GetLargestConsoleWindowSize(hConsole);
+        COORD bufferSize = { windowWidth, bufferHeight };
+        SetConsoleScreenBufferSize(hConsole, bufferSize);
 
-        // 设置窗口缓冲区为最大可见尺寸
-        SetConsoleScreenBufferSize(hConsole, largestSize);
+        SMALL_RECT windowRect = { 0, 0, windowWidth - 1, windowHeight - 1 };
+        SetConsoleWindowInfo(hConsole, TRUE, &windowRect);
 
-        // 设置窗口矩形为满缓冲区大小
-        SMALL_RECT windowSize = { 0, 0, largestSize.X - 1, largestSize.Y - 1 };
-        SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
+        // 更新本地记录的宽高（这里指窗口的可见尺寸）
+        width = windowWidth;
+        height = windowHeight;
 
-        // 更新本地记录的宽高
-        width = largestSize.X;
-        height = largestSize.Y;
-
-        // 初始化缓冲区
-        buffer = std::vector<std::wstring>(height, std::wstring(width, L' '));
+        buffer = std::vector<std::wstring>(bufferHeight, std::wstring(width, L' '));
     }
 
     void UpdateWindowSize() {
@@ -51,6 +73,12 @@ public:
         for (auto& line : buffer) {
             line.assign(width, L' ');
         }
+
+        DWORD dwWritten;
+        COORD coord = { 0, 0 };
+        DWORD consoleSize = width * height;
+        FillConsoleOutputCharacterW(hConsole, L' ', consoleSize, coord, &dwWritten);
+        FillConsoleOutputAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, consoleSize, coord, &dwWritten);
     }
 
     void DrawAt(int x, int y, wchar_t c) {
@@ -91,6 +119,7 @@ public:
             buffer[y][x] = sign; 
         }
     }
+    
 
 };
 
