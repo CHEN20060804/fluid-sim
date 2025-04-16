@@ -15,15 +15,13 @@ public:
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
         HWND hwnd = GetConsoleWindow();
-        ShowWindow(hwnd, SW_MAXIMIZE); // 尽可能最大化窗口
+        ShowWindow(hwnd, SW_MAXIMIZE);
 
-        SetConsoleFont(); // 设置字体尽量小，便于显示更多字符
+        SetConsoleFont();
 
-        // 设置控制台缓冲区尺寸和窗口尺寸一致
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         GetConsoleScreenBufferInfo(hConsole, &csbi);
 
-        // 获取最大可见窗口尺寸（单位：字符数）
         COORD largestSize = GetLargestConsoleWindowSize(hConsole);
 
         // 设置窗口缓冲区为最大可见尺寸
