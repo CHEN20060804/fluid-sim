@@ -2,6 +2,8 @@
 #include <thread>
 #include "ConsoleBuffer.h"
 #include "utility.h"
+#include "Particle.h"
+#include "Integrator.h"
 #define FPS 60
 
 int main() {
@@ -26,11 +28,16 @@ int main() {
         return 0;
     }
     int frameLeft=0, frameTop=0, frameRight=0, frameBottom=0;
+    DrawRectangleFrame(consoleBuffer, frameLeft, frameTop, frameRight, frameBottom);
+	Particle particle0;
+    particle0.position = Vec2((frameLeft + frameRight) / 2, (frameTop + frameBottom) / 2);
+    particle0.velocity = Vec2(0, 0);
+	particle0.force = Vec2(0, 10);
+	std::vector<Particle> particles;
+	particles.push_back(particle0);
+	
     
     auto lastDrawTime = std::chrono::steady_clock::now();
-
-    Vec2 position((frameLeft + frameRight) / 2, (frameTop + frameBottom) / 2);
-    Vec2 velocity(0, 0);
 
     while (true) {
         auto currentTime = std::chrono::steady_clock::now();
@@ -38,14 +45,10 @@ int main() {
         if (elapsed.count() >= 1.0/FPS) {
 
             consoleBuffer.Clear();
-            velocity += Vec2(0, 1.0f) * 5 * 1 / FPS;
-			position += velocity * 1 / FPS;
-			if (position.getY() > consoleBuffer.GetHeight() - 1) {
-				position.setY(consoleBuffer.GetHeight() - 1);
-				velocity.setY(-velocity.getY());
-			}
-			DrawAt(consoleBuffer, position.getX(), position.getY(), L'¡ñ');
             DrawRectangleFrame(consoleBuffer, frameLeft, frameTop, frameRight, frameBottom);
+            Integrator::step(particles, 0.016f, 1.0f);
+			DrawAt(consoleBuffer, particles[0].position.getX(), particles[0].position.getY(), L'¡ñ');
+            
             consoleBuffer.Render();
 
             lastDrawTime = currentTime;

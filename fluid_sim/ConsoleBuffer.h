@@ -15,12 +15,29 @@ public:
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
         HWND hwnd = GetConsoleWindow();
-        ShowWindow(hwnd, SW_MAXIMIZE);
+        ShowWindow(hwnd, SW_MAXIMIZE); // 尽可能最大化窗口
 
-        SetConsoleFont();
+        SetConsoleFont(); // 设置字体尽量小，便于显示更多字符
 
-        UpdateWindowSize();
+        // 设置控制台缓冲区尺寸和窗口尺寸一致
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(hConsole, &csbi);
 
+        // 获取最大可见窗口尺寸（单位：字符数）
+        COORD largestSize = GetLargestConsoleWindowSize(hConsole);
+
+        // 设置窗口缓冲区为最大可见尺寸
+        SetConsoleScreenBufferSize(hConsole, largestSize);
+
+        // 设置窗口矩形为满缓冲区大小
+        SMALL_RECT windowSize = { 0, 0, largestSize.X - 1, largestSize.Y - 1 };
+        SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
+
+        // 更新本地记录的宽高
+        width = largestSize.X;
+        height = largestSize.Y;
+
+        // 初始化缓冲区
         buffer = std::vector<std::wstring>(height, std::wstring(width, L' '));
     }
 
@@ -76,6 +93,7 @@ public:
             buffer[y][x] = sign; 
         }
     }
+
 };
 
 void DrawRectangleFrame(ConsoleBuffer& consoleBuffer, int& frameLeft, int& frameTop, int& frameRight, int& frameBottom) {
