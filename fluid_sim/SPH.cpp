@@ -1,4 +1,5 @@
 #include "SPH.h"
+
 #define M_PI 3.14159265358979323846
 float SPHSolver::poly6(float r, float h) {
 	float hr2 = h * h - r * r;

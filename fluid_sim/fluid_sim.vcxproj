@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,12 +132,14 @@
     <ClInclude Include="ConsoleBuffer.h" />
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleGird.h" />
     <ClInclude Include="SPH.h" />
     <ClInclude Include="utility.h" />
     <ClInclude Include="XPBD.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Integrator.cpp" />
+    <ClCompile Include="ParticleGird.cpp" />
     <ClCompile Include="SPH.cpp" />
     <ClCompile Include="utility.cpp" />
     <ClCompile Include="main.cpp" />

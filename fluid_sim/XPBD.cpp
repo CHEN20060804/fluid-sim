@@ -13,6 +13,11 @@ void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
     const int maxIterations = 10;  // 最大迭代次数
     const float tolerance = 1e-5f;  // 误差容忍度
 
+    // 第一次预测：基于当前速度进行位置预测
+    for (auto& pi : particles) {
+        pi.predictedPosition = pi.position + pi.velocity * dt;
+    }
+
     // 在每个时间步中，首先进行多次约束解算
     for (int iter = 0; iter < maxIterations; ++iter) {
         bool isConverged = true;
@@ -42,15 +47,16 @@ void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
                 if (&pi == &pj) continue;
 
                 Vec2 grad = computeGradient(pi, pj);
-                pj.position += lambda * grad;  // 调整位置
+                pj.predictedPosition += lambda * grad;  // 调整位置（使用预测位置进行修正）
             }
-            pi.position -= lambda * deltaP;  // 更新 pi 的位置
+            pi.predictedPosition -= lambda * deltaP;  // 更新 pi 的预测位置
 
             // 如果约束没有收敛，则标记为未收敛
             if (std::abs(C) > tolerance) {
                 isConverged = false;
             }
         }
+
         // 如果所有粒子的约束已经满足，则提前退出
         if (isConverged) {
             break;
@@ -59,4 +65,9 @@ void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
 
     // 处理边界条件
     applyBoundaryConditions(particles, boundary);
+
+    // 第二次预测：基于约束修正后的预测位置更新实际位置
+    for (auto& pi : particles) {
+        pi.position = pi.predictedPosition;
+    }
 }
