@@ -54,6 +54,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -145,7 +146,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="XPBD.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Sort.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
+    <CudaCompile Include="Sort.cuh" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.targets" />
   </ImportGroup>
 </Project>
