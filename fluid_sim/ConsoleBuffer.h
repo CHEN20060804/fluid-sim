@@ -1,20 +1,19 @@
-ï»¿#include <Windows.h>
+#pragma once
+#include <windows.h>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <locale>
-
 class ConsoleBuffer {
 private:
     int width, height;
     HANDLE hBuffer;
-
     using Buffer = std::vector<std::wstring>;
     Buffer bufferA;
     Buffer bufferB;
 
-    Buffer* frontBuffer; // å½“å‰æ˜¾ç¤ºç¼“å†²åŒº
-    Buffer* backBuffer;  // å½“å‰ç»˜å›¾ç¼“å†²åŒº
+    Buffer* frontBuffer; // µ±Ç°ÏÔÊ¾»º³åÇø
+    Buffer* backBuffer;  // µ±Ç°»æÍ¼»º³åÇø
 
     void HideCursor() {
         CONSOLE_CURSOR_INFO cursorInfo;
@@ -60,22 +59,16 @@ public:
 
         SetConsoleFont();
         SetWindowAndBufferSize(columns, rows);
-        SetConsoleActiveScreenBuffer(hBuffer);//æ˜¾ç¤ºè‡ªå®šä¹‰çš„æŽ§åˆ¶å°çª—å£
+        SetConsoleActiveScreenBuffer(hBuffer);//ÏÔÊ¾×Ô¶¨ÒåµÄ¿ØÖÆÌ¨´°¿Ú
         HideCursor();
         MaximizeConsoleWindow();
     }
 
-    void Clear() {
-        for (auto& line : *backBuffer) {
-            line.assign(width, L' ');
-        }
-
-        DWORD dwWritten;
-        COORD coord = { 0, 0 };
-        DWORD consoleSize = width * height;
-        FillConsoleOutputCharacterW(hConsole, L' ', consoleSize, coord, &dwWritten);
-        FillConsoleOutputAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, consoleSize, coord, &dwWritten);
-    }
+   void Clear() 
+   {
+        std::fill(backBuffer->begin(), backBuffer->end(), std::wstring(width, L' '));
+   }
+    
 
     void DrawAt(int x, int y, wchar_t c) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
@@ -86,18 +79,23 @@ public:
     void SwapBuffers() {
         std::swap(frontBuffer, backBuffer);
     }
-
     void Render() {
         DWORD charsWritten;
+
+        // ´´½¨Ò»¸ö°üº¬ËùÓÐ×Ö·ûµÄ×Ö·û´®
+        std::wstring fullBuffer;
         for (int y = 0; y < height; ++y) {
-            WriteConsoleOutputCharacterW(
-                hBuffer,
-                (*frontBuffer)[y].c_str(),
-                (*frontBuffer)[y].length(),
-                { 0, (SHORT)y },
-                &charsWritten
-            );
+            fullBuffer.append((*frontBuffer)[y]);
         }
+
+        // Ò»´ÎÐÔÐ´ÈëÕû¸ö»º³åÇø
+        WriteConsoleOutputCharacterW(
+            hBuffer,
+            fullBuffer.c_str(),
+            fullBuffer.length(),
+            { 0, 0 },  // ´ÓÆÁÄ»×óÉÏ½Ç¿ªÊ¼Ð´Èë
+            &charsWritten
+        );
     }
 
     void Flush() {

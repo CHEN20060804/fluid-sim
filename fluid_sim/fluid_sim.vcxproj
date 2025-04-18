@@ -53,9 +53,9 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.props" />
-  </ImportGroup>
+<ImportGroup Label="ExtensionSettings">
+  <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.props" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.props')" />
+</ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -149,13 +149,11 @@
     <ClCompile Include="XPBD.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Sort.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
-    <CudaCompile Include="Sort.cuh" />
+    <None Include="Sort.cu" />
+    <None Include="Sort.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.targets" />
-  </ImportGroup>
+<ImportGroup Label="ExtensionSettings">
+  <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.props" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.props')" />
+</ImportGroup>
 </Project>

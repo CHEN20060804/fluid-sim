@@ -6,5 +6,6 @@ struct Particle {
     Vec2 velocity;
     Vec2 force;
     float density = 0.0f;
+	float pressure = 0.0f;
     float lambda = 0.0f; 
 };
