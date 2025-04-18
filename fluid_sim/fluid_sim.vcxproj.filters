@@ -27,16 +27,16 @@
     <ClInclude Include="Integrator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XPBD.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="SPH.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleGird.h">
+    <ClInclude Include="Boundary.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Bound.h">
+    <ClInclude Include="ParticleGrid.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XPBD.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,25 +50,25 @@
     <ClCompile Include="Integrator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XPBD.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="SPH.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleGird.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Bound.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleGrid.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XPBD.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Sort.cu">
-      <Filter>源文件</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Sort.cuh">
+    <None Include="Sort.cuh">
       <Filter>头文件</Filter>
-    </CudaCompile>
+    </None>
+    <None Include="Sort.cu">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

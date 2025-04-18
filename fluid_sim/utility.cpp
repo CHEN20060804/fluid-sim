@@ -76,6 +76,11 @@ Vec2& Vec2::operator/=(float s) {
     return *this;
 }
 
+bool Vec2::operator==(const Vec2& v) const {
+    const float epsilon = 1e-6f; 
+    return (std::fabs(x - v.x) < epsilon) && (std::fabs(y - v.y) < epsilon);
+}
+
 // 获取向量的长度
 float Vec2::length() const {
     return std::sqrt(x * x + y * y);
@@ -99,9 +104,7 @@ std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
 
 //重载数乘运算符
 Vec2 operator*(float s, Vec2 v) {
-    return v.operator*(s);
-}
-
+	return v.operator*(s);
 }
 
 Vec2 Vec2::cwiseProduct(const Vec2& v) const {

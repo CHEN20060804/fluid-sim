@@ -1,4 +1,4 @@
-#include "ParticleGird.h"
+#include "ParticleGrid.h"
 #include <execution>
 #include <algorithm>
 #include <limits> 
@@ -12,7 +12,7 @@ const int p2 = 19349663;
 const int hashTableSize = 2048;
 
 
-void ParticleGird::UpdateParticleLookat() {
+void ParticleGrid::UpdateParticleLookat() {
 	/*std::for_each(std::execution::par, particles.begin(), particles.end(), [&](const Vec2& point, size_t i)
 	{
 			std::pair<int, int> p = PositionToCellCoord(point);
@@ -54,7 +54,7 @@ void ParticleGird::UpdateParticleLookat() {
 		});
 
 }
-std::vector<Particle> ParticleGird::ForeachPointWithinRadius(Vec2 samplePoint,float radius) {
+std::vector<Particle> ParticleGrid::ForeachPointWithinRadius(Vec2 samplePoint,float radius) {
 
 	this->radius = radius;
 	std::pair<int, int> p = PositionToCellCoord(samplePoint);
@@ -79,17 +79,17 @@ std::vector<Particle> ParticleGird::ForeachPointWithinRadius(Vec2 samplePoint,fl
 	return result;
 
 }
-std::pair<int, int> ParticleGird::PositionToCellCoord(const Vec2& point)
+std::pair<int, int> ParticleGrid::PositionToCellCoord(const Vec2& point)
 {
 	int x = static_cast<int>(std::floor(point.x / radius));
 	int y = static_cast<int>(std::floor(point.y / radius));
 	return { x, y };
 }
-int ParticleGird::HashCell(int x, int y)
+int ParticleGrid::HashCell(int x, int y)
 {
 	return (x * p1) ^ (y * p2);
 }
-int ParticleGird::GetKeyFromHash(int hash)
+int ParticleGrid::GetKeyFromHash(int hash)
 {
 	return std::abs(hash) % hashTableSize;
 }
