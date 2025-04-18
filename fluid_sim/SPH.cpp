@@ -66,6 +66,7 @@ void SPHSolver::simulateStep(float delteTime)
 	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
 		    std::vector<Particle> other = particleGird.ForeachPointWithinRadius(particles[i].prediction,this->smoothingRadius);
 			particles[i].force += viscosityForce(particles[i], other);
+
 			particles[i].force += surfaceTensionForce(particles[i], other);
 		});
 
