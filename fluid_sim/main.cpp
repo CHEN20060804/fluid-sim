@@ -1,10 +1,8 @@
 #include <chrono>
 #include <thread>
 #include "ConsoleBuffer.h"
-#include "utility.h"
-#include "Particle.h"
-#include "Integrator.h"
-#define FPS 60
+#include <locale>
+#include <iostream>
 
 int main() {
     std::wcout.imbue(std::locale(""));
