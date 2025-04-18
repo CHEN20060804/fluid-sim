@@ -7,10 +7,9 @@ private:
 public:
     Vec2(float x, float y);
     Vec2();
-    float getX() const;
-    float getY() const;
-    void setX(float x);
-    void setY(float y);
+    float& getX();
+    float& getY();
+    
     Vec2 operator+(const Vec2& b) const;
     Vec2 operator-(const Vec2& b) const;
     Vec2 operator-();
@@ -28,3 +27,4 @@ public:
 };
 
 Vec2 operator*(Vec2 v);
+

@@ -24,6 +24,18 @@
     <ClInclude Include="Particle.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Integrator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XPBD.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SPH.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleGird.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utility.cpp">
@@ -32,5 +44,25 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Integrator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XPBD.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SPH.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleGird.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Sort.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Sort.cuh">
+      <Filter>头文件</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

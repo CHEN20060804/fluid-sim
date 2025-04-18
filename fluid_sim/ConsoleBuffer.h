@@ -1,4 +1,4 @@
-#include <Windows.h>
+ï»¿#include <Windows.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -13,8 +13,8 @@ private:
     Buffer bufferA;
     Buffer bufferB;
 
-    Buffer* frontBuffer; // µ±Ç°ÏÔÊ¾»º³åÇø
-    Buffer* backBuffer;  // µ±Ç°»æÍ¼»º³åÇø
+    Buffer* frontBuffer; // å½“å‰æ˜¾ç¤ºç¼“å†²åŒº
+    Buffer* backBuffer;  // å½“å‰ç»˜å›¾ç¼“å†²åŒº
 
     void HideCursor() {
         CONSOLE_CURSOR_INFO cursorInfo;
@@ -60,7 +60,7 @@ public:
 
         SetConsoleFont();
         SetWindowAndBufferSize(columns, rows);
-        SetConsoleActiveScreenBuffer(hBuffer);//ÏÔÊ¾×Ô¶¨ÒåµÄ¿ØÖÆÌ¨´°¿Ú
+        SetConsoleActiveScreenBuffer(hBuffer);//æ˜¾ç¤ºè‡ªå®šä¹‰çš„æ§åˆ¶å°çª—å£
         HideCursor();
         MaximizeConsoleWindow();
     }
@@ -69,6 +69,12 @@ public:
         for (auto& line : *backBuffer) {
             line.assign(width, L' ');
         }
+
+        DWORD dwWritten;
+        COORD coord = { 0, 0 };
+        DWORD consoleSize = width * height;
+        FillConsoleOutputCharacterW(hConsole, L' ', consoleSize, coord, &dwWritten);
+        FillConsoleOutputAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, consoleSize, coord, &dwWritten);
     }
 
     void DrawAt(int x, int y, wchar_t c) {

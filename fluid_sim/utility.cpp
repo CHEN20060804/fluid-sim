@@ -6,18 +6,13 @@ Vec2::Vec2(float x, float y) : x(x), y(y) {}
 Vec2::Vec2() : x(0.0f), y(0.0f) {} // 默认构造函数，初始化为(0, 0)
 
 
-float Vec2::getX() const {
+float& Vec2::getX()  {
     return x;
 }
-float Vec2::getY() const {
+float& Vec2::getY()  {
     return y;
 }
-void Vec2::setX(float x){
-	this->x = x;
-}
-void Vec2::setY(float y){
-	this->y = y;
-}
+
 // 加法运算符重载
 Vec2 Vec2::operator+(const Vec2& b) const {
     return Vec2(x + b.x, y + b.y);
@@ -103,8 +98,10 @@ std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
 }
 
 //重载数乘运算符
-Vec2 operator*(Vec2 v, float s) {
-	return v.operator*(s);
+Vec2 operator*(float s, Vec2 v) {
+    return v.operator*(s);
+}
+
 }
 
 Vec2 Vec2::cwiseProduct(const Vec2& v) const {
