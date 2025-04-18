@@ -76,9 +76,9 @@ Vec2& Vec2::operator/=(float s) {
     return *this;
 }
 
-bool Vec2::operator==(const Vec2& v)
-{
-	return (x == v.x && y == v.y);
+bool Vec2::operator==(const Vec2& v) const {
+    const float epsilon = 1e-6f; 
+    return (std::fabs(x - v.x) < epsilon) && (std::fabs(y - v.y) < epsilon);
 }
 
 // 获取向量的长度

@@ -3,13 +3,13 @@
 #include "Particle.h"
 #include <vector>
 #include "Sort.cuh"
-class ParticleGird {
+class ParticleGrid {
 public:
-	ParticleGird(std::vector<Particle>& particles) : particles(particles) {};
+	ParticleGrid(std::vector<Particle>& particles) : particles(particles) {};
 	void UpdateParticleLookat();
 	std::vector<Particle> ForeachPointWithinRadius(Vec2 samplePoint,float radius);
 	std::pair<int, int> PositionToCellCoord(const Vec2& point);
-	~ParticleGird() {
+	~ParticleGrid() {
 		particles.clear();
 	}
 

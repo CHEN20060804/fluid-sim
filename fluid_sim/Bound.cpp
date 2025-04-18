@@ -1,24 +1,30 @@
-#include "Bound.h"
-void Bound::ResolveCollisions(Vec2& velocity, Vec2& position, float damping = 0.5f)
+#include "Boundary.h"
+void Boundary::ResolveCollisions(Vec2& velocity, Vec2& position, float damping )
 {
-    if (position.x < margin) {
-        position.x = margin;
-        if (velocity.x < 0) velocity.x *= -damping;
+    float px = position.getX();
+    float py = position.getY();
+	float vx = velocity.getX();
+    float vy = velocity.getY();
+
+    //×óÇ½
+    if (px < margin) {
+        px = margin;
+        if (vx < 0) vx *= -damping;
     }
     // ÓÒÇ½
-    else if (position.x > width - margin) {
-        position.x = width - margin;
-        if (velocity.x > 0) velocity.x *= -damping;
+    else if (px> width - margin) {
+        px = width - margin;
+        if (vx > 0) vx *= -damping;
     }
 
     // ÏÂÇ½
-    if (position.y < margin) {
-        position.y = margin;
-        if (velocity.y < 0) velocity.y *= -damping;
+    if (py < margin) {
+        py = margin;
+        if (vy < 0) vy *= -damping;
     }
     // ÉÏÇ½
-    else if (position.y > height - margin) {
-        position.y = height - margin;
-        if (velocity.y > 0) velocity.y *= -damping;
+    else if (py> height - margin) {
+        py = height - margin;
+        if (vy> 0) vy *= -damping;
     }
 }
