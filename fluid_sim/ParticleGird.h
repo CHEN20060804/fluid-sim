@@ -2,21 +2,24 @@
 #include "utility.h"
 #include "Particle.h"
 #include <vector>
-
-struct Entry {
-	int index;
-	int cellKey;
-	Entry(int idx, int key) : index(idx), cellKey(key) {};
-};
+#include "Sort.cuh"
 class ParticleGird {
 public:
-	ParticleGird(std::vector<Particle> particles) {};
+	ParticleGird(std::vector<Particle>& particles) : particles(particles) {};
 	void UpdateParticleLookat();
-	std::vector<Particle> ForeachPointWithinRadius(Vec2 samplePoint);
+	std::vector<Particle> ForeachPointWithinRadius(Vec2 samplePoint,float radius);
 	std::pair<int, int> PositionToCellCoord(const Vec2& point);
+	~ParticleGird() {
+		particles.clear();
+	}
+
 private:
 	int ParticleNum;
-	std::vector<Particle> particles;
+	float cellSize = 0.1f; // 网格大小
+	float radius;
+	int HashCell(int x, int y);
+	int GetKeyFromHash(int hash);
+	std::vector<Particle>& particles;
 	std::vector<int> startIndex{ ParticleNum };//编译器会优先认为他是一个函数，所以请使用{}
 	std::vector<Entry> spatiacleLookat{ ParticleNum };
 	std::vector<std::pair<int, int>> offsets{

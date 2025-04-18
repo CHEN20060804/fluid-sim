@@ -5,7 +5,7 @@
 #include "Particle.h"
 #include "Integrator.h"
 #define FPS 60
-
+ const int gravity = 10;
 int main() {
     std::wcout.imbue(std::locale(""));
     // 创建双缓冲对象

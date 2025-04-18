@@ -36,6 +36,9 @@
     <ClInclude Include="ParticleGird.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Bound.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utility.cpp">
@@ -54,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ParticleGird.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Bound.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

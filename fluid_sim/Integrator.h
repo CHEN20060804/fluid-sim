@@ -3,5 +3,5 @@
 #include<vector>
 class Integrator {
 public:
-	static void step(std::vector<Particle>& particles, float ds, float mass);
+	static void step(Particle particle, float ds, float mass);
 };

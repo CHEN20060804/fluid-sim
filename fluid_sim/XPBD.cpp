@@ -15,7 +15,7 @@ void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
 
     // 第一次预测：基于当前速度进行位置预测
     for (auto& pi : particles) {
-        pi.predictedPosition = pi.position + pi.velocity * dt;
+        pi.prediction = pi.position + pi.velocity * dt;
     }
 
     // 在每个时间步中，首先进行多次约束解算
@@ -47,9 +47,9 @@ void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
                 if (&pi == &pj) continue;
 
                 Vec2 grad = computeGradient(pi, pj);
-                pj.predictedPosition += lambda * grad;  // 调整位置（使用预测位置进行修正）
+                pj.prediction += lambda * grad;  // 调整位置（使用预测位置进行修正）
             }
-            pi.predictedPosition -= lambda * deltaP;  // 更新 pi 的预测位置
+            pi.prediction -= lambda * deltaP;  // 更新 pi 的预测位置
 
             // 如果约束没有收敛，则标记为未收敛
             if (std::abs(C) > tolerance) {
