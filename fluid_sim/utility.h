@@ -22,6 +22,7 @@ public:
 	Vec2& operator/=(float s);
 	float length() const;
 	Vec2 normalize() const;
+	Vec2 cwiseProduct(const Vec2& v) const;
 
     friend std::ostream& operator<<(std::ostream& os, const Vec2& vec);
 };

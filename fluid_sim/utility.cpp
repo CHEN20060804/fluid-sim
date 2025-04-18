@@ -106,3 +106,7 @@ std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
 Vec2 operator*(Vec2 v, float s) {
 	return v.operator*(s);
 }
+
+Vec2 Vec2::cwiseProduct(const Vec2& v) const {
+	return Vec2(x*v.x, y*v.y);
+}

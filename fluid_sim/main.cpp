@@ -2,36 +2,18 @@
 #include <thread>
 #include "ConsoleBuffer.h"
 #include <locale>
-
+#include <iostream>
 
 int main() {
     std::wcout.imbue(std::locale(""));
-    // ´´½¨Ë«»º³å¶ÔÏó
     ConsoleBuffer consoleBuffer;
-    // Òþ²Ø¹â±ê
-    HideCursor();
-    if (!IsRunningAsAdmin()) {
-        wchar_t exePath[MAX_PATH];
-        GetModuleFileNameW(NULL, exePath, MAX_PATH);
-
-        SHELLEXECUTEINFOW sei = { sizeof(sei) };
-        sei.lpVerb = L"runas";
-        sei.lpFile = exePath;
-        sei.nShow = SW_SHOWNORMAL;
-
-        if (!ShellExecuteExW(&sei)) {
-            std::cerr << "ÌáÈ¨Ê§°Ü£¬´íÎóÂë£º" << GetLastError() << std::endl;
-            return 1;
-        }
-        return 0;
-    }
-    int frameLeft, frameTop, frameRight, frameBottom;
 
     while (true) {
         consoleBuffer.Clear();
-        DrawRectangleFrame(consoleBuffer, frameLeft, frameTop, frameRight, frameBottom);
-        consoleBuffer.Render();
+
+       //»æÍ¼Âß¼­
+
+        consoleBuffer.Flush();  // Ë«»º³åäÖÈ¾
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    return 0;
 }
