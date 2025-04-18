@@ -4,6 +4,7 @@
 #include "Boundary.h"
 #include <locale>
 #include <iostream>
+const int gravity = 10;
 
 int main() {
     std::wcout.imbue(std::locale(""));

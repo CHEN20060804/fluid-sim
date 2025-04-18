@@ -1,9 +1,8 @@
 //cuda_common.cuh нд╪Ч
-#ifdef __CUDACC__
 #ifndef CUDA_COMMON_H
 #define CUDA_COMMON_H
-//#include "cuda_runtime.h"
-//#include "device_launch_parameters.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 #include <iostream>
 struct Entry {
 	int index;
@@ -14,8 +13,7 @@ struct Entry {
 
 
 __global__ void SortPairs(Entry* values, int numValues, int groundHeight, int groupWidth, int stepIndex);
-void launchSortPairs(Entry* values, int numValues, int groupHeight, int groupWidth, int stepIndex, int threadsPerBlock);
+__host__ void launchSortPairs(Entry* values, int numValues, int groupHeight, int groupWidth, int stepIndex, int threadsPerBlock);
 
 
-#endif
 #endif

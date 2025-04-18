@@ -64,10 +64,10 @@ void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
     }
 
     // 处理边界条件
-    applyBoundaryConditions(particles, boundary);
+    //applyBoundaryConditions(particles, boundary);
 
     // 第二次预测：基于约束修正后的预测位置更新实际位置
     for (auto& pi : particles) {
-        pi.position = pi.predictedPosition;
+        pi.position = pi.prediction;
     }
 }

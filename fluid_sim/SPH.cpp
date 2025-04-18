@@ -1,7 +1,7 @@
 #include "SPH.h"
 #include "Integrator.h"
 
-extern const int gravity;
+const int gravity = 10;
 #define M_PI 3.14159265358979323846
 float SPHSolver::poly6(float r, float h)
 {

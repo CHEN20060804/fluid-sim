@@ -12,6 +12,14 @@ float& Vec2::getX()  {
 float& Vec2::getY()  {
     return y;
 }
+float Vec2::X() const
+{
+    return x;
+}
+float Vec2::Y() const
+{
+    return y;
+}
 
 // 加法运算符重载
 Vec2 Vec2::operator+(const Vec2& b) const {

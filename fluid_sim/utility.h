@@ -9,17 +9,22 @@ public:
     Vec2();
     float& getX();
     float& getY();
+	float X() const;
+    float Y() const;
     
     Vec2 operator+(const Vec2& b) const;
     Vec2 operator-(const Vec2& b) const;
     Vec2 operator-();
     Vec2 operator/(float s) const;
     Vec2 operator*(float s) const;
+
     Vec2& operator+=(const Vec2& b);
     Vec2& operator-=(const Vec2& b);
 	Vec2& operator*=(float s);
 	Vec2& operator/=(float s);
+
     bool operator==(const Vec2 & v) const;
+
 	float length() const;
 	Vec2 normalize() const;
 	Vec2 cwiseProduct(const Vec2& v) const;

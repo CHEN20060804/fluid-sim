@@ -70,7 +70,7 @@ std::vector<Particle> ParticleGrid::ForeachPointWithinRadius(Vec2 samplePoint,fl
 			if (spatiacleLookat[i].cellKey != key) break;
 			Vec2 pos = particles[spatiacleLookat[i].index].prediction;
 			Vec2 offset = samplePoint - pos;
-			float sqrDist = offset.x * offset.x + offset.y * offset.y;
+			float sqrDist = offset.getX() * offset.getY() + offset.getY() * offset.getY();
 			if (sqrDist <= radius * radius) {
 				result.push_back(particles[spatiacleLookat[i].index]);
 			}
@@ -81,8 +81,8 @@ std::vector<Particle> ParticleGrid::ForeachPointWithinRadius(Vec2 samplePoint,fl
 }
 std::pair<int, int> ParticleGrid::PositionToCellCoord(const Vec2& point)
 {
-	int x = static_cast<int>(std::floor(point.x / radius));
-	int y = static_cast<int>(std::floor(point.y / radius));
+	int x = static_cast<int>(std::floor(point.X() / radius));
+	int y = static_cast<int>(std::floor(point.Y() / radius));
 	return { x, y };
 }
 int ParticleGrid::HashCell(int x, int y)
