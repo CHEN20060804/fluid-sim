@@ -177,6 +177,10 @@
     </CudaCompile>
     <CudaCompile Include="Sort.cuh" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Sort.cu" />
+    <None Include="Sort.cuh" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.6.targets" />

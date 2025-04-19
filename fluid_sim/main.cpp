@@ -12,10 +12,9 @@ int main() {
     Boundary boundary;
     while (true) {
         consoleBuffer.Clear();
-
-       //»æÍ¼Âß¼­
         boundary.drawBoundary(consoleBuffer);
-        consoleBuffer.Flush();  // Ë«»º³åäÖÈ¾
+        consoleBuffer.Flush();
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    std::cin.get();
 }

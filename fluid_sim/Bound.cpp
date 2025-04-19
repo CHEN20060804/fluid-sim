@@ -28,3 +28,19 @@ void Boundary::ResolveCollisions(Vec2& velocity, Vec2& position, float damping )
         if (vy> 0) vy *= -damping;
     }
 }
+
+void Boundary::drawBoundary(ConsoleBuffer& console)
+{
+    for (int i = margin; i < margin + width; i++) {
+        console.DrawAt(i, margin, L'©¥');
+        console.DrawAt(i, margin + height, L'©¥');
+    }
+    console.DrawAt(margin, margin, L'©³');
+    console.DrawAt(width + margin, margin, L'©·');
+    console.DrawAt(margin, margin + height, L'©»');
+    console.DrawAt(width + margin, margin + height, L'©¿');
+    for (int i = margin + 1; i < height + margin; i++) {
+        console.DrawAt(margin, i, L'©§');
+        console.DrawAt(width + margin, i, L'©§');
+    }
+}

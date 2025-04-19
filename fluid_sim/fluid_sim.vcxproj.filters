@@ -64,11 +64,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Sort.cu">
-      <Filter>源文件</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Sort.cuh">
+    <None Include="Sort.cuh">
       <Filter>头文件</Filter>
-    </CudaCompile>
+    </None>
+    <None Include="Sort.cu">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
