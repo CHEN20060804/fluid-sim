@@ -1,6 +1,6 @@
 #include "SPH.h"
 #include "Integrator.h"
-
+#include <fstream>
 const int gravity = 10;
 #define M_PI 3.14159265358979323846
 float SPHSolver::poly6(float r, float h)
@@ -13,7 +13,7 @@ float SPHSolver::computeDensity(const Particle& pi, const std::vector<Particle>&
 {
 	float density = 0.0f;
 	for (const Particle& pj : particles) {
-		Vec2 r = pi.position - pj.position;
+		Vec2 r = pi.prediction - pj.prediction;
 		float dist = r.length();
 		if (dist < smoothingRadius)
 			density +=poly6(dist, smoothingRadius);//质量为1
@@ -23,8 +23,8 @@ float SPHSolver::computeDensity(const Particle& pi, const std::vector<Particle>&
 
 float SPHSolver::computeEveryPressure(float density)
 {
-	float stiffness = 1000.0f;
-	return stiffness * (density - restDensity);
+	float stiffness = 3.0f;
+	return stiffness * std::max(0.0f,(density - restDensity));
 }
 
 Vec2 SPHSolver::computePressureForce(const Particle& pi, const std::vector<Particle>& particles)
@@ -35,9 +35,9 @@ Vec2 SPHSolver::computePressureForce(const Particle& pi, const std::vector<Parti
 	{
 		if (&pi == &pj) continue; // 不和自己算力
 
-		Vec2 r = pi.position - pj.position;
+		Vec2 r = pi.prediction - pj.prediction;
 		float dist = r.length();
-		if (dist <= 0.00001f || dist > smoothingRadius) continue;
+		if (dist <= 0.000001f || dist > smoothingRadius) continue;
 
 		float pij = (pi.pressure + pj.pressure) / 2.0f;
 		float grad = spikyGradient(dist, smoothingRadius);
@@ -97,25 +97,41 @@ void SPHSolver::simulateStep(float delteTime)
 		Particle& pi = particles[i];
 		pi.force = Vec2(0.0f, 0.0f);
 		pi.velocity += Vec2(0, 1) * gravity * delteTime;// 重置力
-		pi.prediction = pi.position + pi.velocity * delteTime;
+		pi.prediction = pi.position + pi.velocity * delteTime;//目前测试，暂时改为position
+		std::wofstream log("prrdiction.txt", std::ios::app);
+		log << L"particle[" << i << L"] prediction = " << pi.prediction.getX() << " " << pi.prediction.getY() << L"\n";
 		});
-	particleGird.UpdateParticleLookat();
+	//ParticleGrid::getInstance().UpdateParticleLookat();
 
 	/*Parallel.For(0, numParticles.i = >
 	{
 		densities[i] = CalculateDensity(predictedPositions[i]);
 	});*/
+	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
+		//std::vector<Particle> other = ParticleGrid::getInstance().ForeachPointWithinRadius(particles[i].prediction, this->smoothingRadius);
+		/*std::wofstream log("neighbor_debug.txt", std::ios::app);
+		log << L"particle[" << i << L"] neighbor count = " << other.size() << L"\n";*/
+		particles[i].density = computeDensity(particles[i], particles);
+	});
 
 	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
-		    std::vector<Particle> other = particleGird.ForeachPointWithinRadius(particles[i].prediction,this->smoothingRadius);
-			particles[i].force += viscosityForce(particles[i], other);
-
-			particles[i].force += surfaceTensionForce(particles[i], other);
+		    //std::vector<Particle> other = ParticleGrid::getInstance().ForeachPointWithinRadius(particles[i].prediction, this->smoothingRadius);
+			//particles[i].force += viscosityForce(particles[i], other);
+			particles[i].pressure = computeEveryPressure(particles[i].density);
+			std::wofstream log("debug_log.txt", std::ios::app); // 追加写入
+			
+			    
+			particles[i].force += computePressureForce(particles[i], particles);
+			log << L"particle[" << i << L"] pressure=("
+				<< particles[i].pressure << L" "
+				<< particles[i].force.getX() << L" "
+				<< particles[i].force.getY() << L" "
+				<< particles[i].density << L"\n ";
+			//particles[i].force += surfaceTensionForce(particles[i], other);
 		});
 
 	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
 		Integrator::step(particles[i], delteTime, 1.0f);
-
 		});
 
 

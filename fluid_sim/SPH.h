@@ -10,15 +10,15 @@
 class SPHSolver {
 public:
     // 模拟参数
-    float smoothingRadius = 0.1f;
+	SPHSolver(std::vector<Particle>& particles) :particles(particles),smoothingRadius(0.1f), viscosity(0.1f), surfaceTension(0.0728f), restDensity(1000.0f) {}
+    float smoothingRadius = 3.0f;
     float viscosity = 0.1f;
     float surfaceTension = 0.0728f;
-    float restDensity = 1000.0f;
+    float restDensity = 1.0f;
 
     // 粒子集合和网格
-    std::vector<Particle> particles;
-    ParticleGrid particleGird;
-
+    std::vector<Particle>& particles;
+  
     // 主要步骤函数
     void simulateStep(float deltaTime);
 

@@ -42,7 +42,7 @@ private:
     }
 
 public:
-    ConsoleBuffer(int columns = 400, int rows = 300)
+    ConsoleBuffer(int columns = 400, int rows = 240)
         : width(columns), height(rows),
         bufferA(rows, std::wstring(columns, L' ')),
         bufferB(rows, std::wstring(columns, L' ')) {

@@ -18,6 +18,8 @@ public:
     Vec2 operator/(float s) const;
     Vec2 operator*(float s) const;
 
+	float operator*(const Vec2& b) const;
+
     Vec2& operator+=(const Vec2& b);
     Vec2& operator-=(const Vec2& b);
 	Vec2& operator*=(float s);

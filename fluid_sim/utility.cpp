@@ -118,3 +118,7 @@ Vec2 operator*(float s, Vec2 v) {
 Vec2 Vec2::cwiseProduct(const Vec2& v) const {
 	return Vec2(x*v.x, y*v.y);
 }
+float Vec2::operator*(const Vec2& b) const
+{
+	return x * b.x + y * b.y;
+}
