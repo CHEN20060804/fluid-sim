@@ -1,14 +1,16 @@
-#include "XPBD.h"
+ï»¿#include "XPBD.h"
+#include <numeric>
+#include <execution>
 #define M_PI 3.14159265358979323846
-Vec2 boundaryMin(50.0f, 50.0f);
-Vec2 boundaryMax(400.0f, 250.0f);
-float XPBDConstraint::computeConstraint(const Particle& pi) {
-	return pi.density - restDensity;
+Vec2 boundaryMin(10.0f, 10.0f);
+Vec2 boundaryMax(360.0f, 210.0f);
+float XPBDConstraint::computeConstraint(const Particle& p) {
+    return (p.density / restDensity) - 1.0f; // C = Ï/Ïâ‚€ - 1
 }
 Vec2 XPBDConstraint::computeGradient(const Particle& pi,const Particle& pj) {
 	Vec2 r = pi.prediction - pj.prediction;
 	float dist = r.length();
-	if (dist <= 0.00001f || dist > smoothingRadius) return Vec2();//¾àÀë¹ıĞ¡ÊÓÎªÖØºÏ
+	if (dist <= 0.00001f || dist > smoothingRadius) return Vec2();//è·ç¦»è¿‡å°è§†ä¸ºé‡åˆ
 	return r.normalize() * (-45.0f / (M_PI * pow(smoothingRadius, 6))) * (pow(smoothingRadius - dist, 2));
 }
 
@@ -19,7 +21,7 @@ Vec2 XPBDConstraint::computeSurfaceTensionGradient(const Particle& pi, const Par
 {
     Vec2 r = pi.prediction - pj.prediction;
 	float len = r.length();
-	if (len <= 0.00001f || len > smoothingRadius) return Vec2();//¾àÀë¹ıĞ¡ÊÓÎªÖØºÏ
+	if (len <= 0.00001f || len > smoothingRadius) return Vec2();//è·ç¦»è¿‡å°è§†ä¸ºé‡åˆ
     return r / len;
 }
 
@@ -32,131 +34,257 @@ Vec2 XPBDConstraint::computeViscosityGradient(const Particle& pi, const Particle
 {
 	Vec2 vij = pi.velocity - pj.velocity;
     float len = vij.length();
-	if (len <= 0.00001f || len > smoothingRadius) return Vec2();//¾àÀë¹ıĞ¡ÊÓÎªÖØºÏ
+	if (len <= 0.00001f || len > smoothingRadius) return Vec2();//è·ç¦»è¿‡å°è§†ä¸ºé‡åˆ
     return vij;
 }
 void XPBDConstraint::applyBoundaryConstraint(Particle& p, const Vec2& boundaryMin, const Vec2& boundaryMax, float bounceDamping) {
-    
-        if (p.prediction.X() < boundaryMin.X()) {
-            p.prediction.getX() = boundaryMin.X();
-            p.velocity.getX() *= -bounceDamping;
+    Vec2 correction(0.0f, 0.0f); // æ¨å›é‡
+    Vec2 normal(0.0f, 0.0f);     // åˆæˆæ³•çº¿
+
+    // æ£€æŸ¥ X æ–¹å‘
+    if (p.prediction.X() < boundaryMin.X()) {
+        float penetration = boundaryMin.X() - p.prediction.X();
+        correction.getX() += penetration;
+        normal += Vec2(1.0f, 0.0f);  // å‘å³çš„æ³•çº¿
+    }
+    else if (p.prediction.X() > boundaryMax.X()) {
+        float penetration = p.prediction.X() - boundaryMax.X();
+        correction.getX() -= penetration;
+        normal += Vec2(-1.0f, 0.0f); // å‘å·¦çš„æ³•çº¿
+    }
+
+    // æ£€æŸ¥ Y æ–¹å‘
+    if (p.prediction.Y() < boundaryMin.Y()) {
+        float penetration = boundaryMin.Y() - p.prediction.Y();
+        correction.getY() += penetration;
+        normal += Vec2(0.0f, 1.0f);  // å‘ä¸Šçš„æ³•çº¿
+    }
+    else if (p.prediction.Y() > boundaryMax.Y()) {
+        float penetration = p.prediction.Y() - boundaryMax.Y();
+        correction.getY() -= penetration;
+        normal += Vec2(0.0f, -1.0f); // å‘ä¸‹çš„æ³•çº¿
+    }
+
+    // å¦‚æœæœ‰æ¥è§¦ï¼Œå¤„ç†åå¼¹
+    if (normal.length() > 0.0f) {
+        normal = normal.normalize(); // å½’ä¸€åŒ–åˆæˆæ³•çº¿
+        float vDotN = p.velocity * normal;
+
+        // åªå¤„ç†æœå‘è¾¹ç•Œçš„é€Ÿåº¦ï¼ˆé¿å…å¸é™„ï¼‰
+        if (vDotN < 0.0f) {
+            // åå°„å…¬å¼ï¼šv = v - (1 + e)(vÂ·n)n
+            p.velocity -= (1.0f + bounceDamping) * vDotN * normal;
         }
-        else if (p.prediction.X() > boundaryMax.X()) {
-            p.prediction.getX() = boundaryMax.X();
-            p.velocity.getX() *= -bounceDamping;
-        }
-		if (p.prediction.Y() < boundaryMin.Y()) {
-			p.prediction.getY() = boundaryMin.Y();
-			p.velocity.getY() *= -bounceDamping;
-		}
-        else if (p.prediction.Y() > boundaryMax.Y()) {
-            p.prediction.getY() = boundaryMax.Y();
-            p.velocity.getY() *= -bounceDamping;
-        }
+
+        // æ¨å›ä½ç½®
+        p.prediction += correction * 1.2f;
+    }
 }
 
+//void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
+//
+//    std::vector<size_t> indices(particles.size());
+//    std::iota(indices.begin(), indices.end(), 0);
+//
+//    const int maxIterations = 10;  // æœ€å¤§è¿­ä»£æ¬¡æ•°
+//    const float tolerance = 1e-5f;  // è¯¯å·®å®¹å¿åº¦
+//
+//    // ç¬¬ä¸€æ¬¡é¢„æµ‹ï¼šåŸºäºå½“å‰é€Ÿåº¦è¿›è¡Œä½ç½®é¢„æµ‹
+//    for (auto& pi : particles) {
+//        pi.prediction = pi.position + pi.velocity * dt;
+//    }
+//
+//    // åœ¨æ¯ä¸ªæ—¶é—´æ­¥ä¸­ï¼Œé¦–å…ˆè¿›è¡Œå¤šæ¬¡çº¦æŸè§£ç®—
+//    for (int iter = 0; iter < maxIterations; ++iter) {
+//        bool isConverged = true;
+//
+//        // è®¡ç®—æ¯ä¸ªç²’å­çš„å¯†åº¦
+//        std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i)
+//        {
+//            particles[i].density = computeDensityPrediction(particles[i], particles);
+//        });
+//
+//        // å¤„ç†å¯†åº¦çº¦æŸ
+//        for (auto& pi : particles) {
+//            float C = computeConstraint(pi);  // è®¡ç®—å¯†åº¦çº¦æŸè¿åé‡
+//            if (std::abs(C) < tolerance) continue;  // å¦‚æœè¯¯å·®è¶³å¤Ÿå°ï¼Œå¯ä»¥è·³è¿‡è¯¥ç²’å­
+//
+//            Vec2 sumGrad2(0, 0);
+//            // è®¡ç®—æ¯å¯¹ç²’å­çš„çº¦æŸæ¢¯åº¦å’Œä¿®æ­£é‡
+//            for (auto& pj : particles) {
+//                if (&pi == &pj) continue;
+//
+//                Vec2 grad = computeGradient(pi, pj);
+//                sumGrad2 += grad.cwiseProduct(grad);  // æ¢¯åº¦çš„å¹³æ–¹å’Œ
+//            }
+//
+//            // è®¡ç®—æ‹‰æ ¼æœ—æ—¥ä¹˜å­ Î»
+//            float lambda = C / (sumGrad2.length() + compliance);  // è®¡ç®— Î»
+//
+//            // æ›´æ–°ç²’å­çš„ä½ç½®
+//            for (auto& pj : particles) {
+//                if (&pi == &pj) continue;
+//
+//                Vec2 grad = computeGradient(pi, pj);
+//                pj.prediction += lambda * grad;  // è°ƒæ•´ä½ç½®ï¼ˆä½¿ç”¨é¢„æµ‹ä½ç½®è¿›è¡Œä¿®æ­£ï¼‰
+//            }
+//
+//            // å¦‚æœçº¦æŸæ²¡æœ‰æ”¶æ•›ï¼Œåˆ™æ ‡è®°ä¸ºæœªæ”¶æ•›
+//            if (std::abs(C) > tolerance) {
+//                isConverged = false;
+//            }
+//        }
+//
+//        // å¤„ç†è¡¨é¢å¼ åŠ›çº¦æŸ
+//        for (auto& pi : particles) {
+//            for (auto& pj : particles) {
+//                if (&pi == &pj) continue;
+//
+//                float C_surface = computeSurfaceTensionConstraint(pi, pj, smoothingRadius);
+//                if (std::abs(C_surface) < tolerance) continue;  // å¦‚æœè¯¯å·®è¶³å¤Ÿå°ï¼Œå¯ä»¥è·³è¿‡è¯¥ç²’å­
+//
+//                Vec2 grad_surface = computeSurfaceTensionGradient(pi, pj);
+//                pi.prediction += grad_surface * C_surface * compliance;  // ä¿®æ­£ä½ç½®
+//            }
+//        }
+//
+//        // å¤„ç†ç²˜æ€§çº¦æŸ
+//        for (auto& pi : particles) {
+//            for (auto& pj : particles) {
+//                if (&pi == &pj) continue;
+//
+//                float C_viscosity = computeViscosityConstraint(pi, pj);
+//                if (std::abs(C_viscosity) < tolerance) continue;  // å¦‚æœè¯¯å·®è¶³å¤Ÿå°ï¼Œå¯ä»¥è·³è¿‡è¯¥ç²’å­
+//
+//                Vec2 grad_viscosity = computeViscosityGradient(pi, pj);
+//                pi.prediction += grad_viscosity * C_viscosity * compliance;  // ä¿®æ­£ä½ç½®
+//            }
+//        }
+//
+//        // å¦‚æœæ‰€æœ‰ç²’å­çš„çº¦æŸå·²ç»æ»¡è¶³ï¼Œåˆ™æå‰é€€å‡º
+//        if (isConverged) {
+//            break;
+//        }
+//    }
+//
+//    // ç¬¬äºŒæ¬¡é¢„æµ‹ï¼šåŸºäºçº¦æŸä¿®æ­£åçš„é¢„æµ‹ä½ç½®æ›´æ–°å®é™…ä½ç½®
+//    for (auto& pi : particles) {
+//        applyBoundaryConstraint(pi, boundaryMin, boundaryMax, 0.9);
+//
+//        Vec2 newVelocity = (pi.prediction - pi.position) / dt;
+//
+//        // é™åˆ¶æœ€å¤§é€Ÿåº¦ï¼Œé˜²æ­¢ç¬æ—¶è·³å‡º
+//        const float maxSpeed = 500.0f;
+//        if (newVelocity.length() > maxSpeed)
+//            newVelocity = newVelocity.normalize() * maxSpeed;
+//
+//        pi.velocity = newVelocity;
+//        pi.position = pi.prediction;
+//    }
+//}
 void XPBDConstraint::solve(std::vector<Particle>& particles, float dt) {
-    const int maxIterations = 10;  // ×î´óµü´ú´ÎÊı
-    const float tolerance = 1e-5f;  // Îó²îÈİÈÌ¶È
+    std::vector<size_t> indices(particles.size());
+    std::iota(indices.begin(), indices.end(), 0);
 
-    // µÚÒ»´ÎÔ¤²â£º»ùÓÚµ±Ç°ËÙ¶È½øĞĞÎ»ÖÃÔ¤²â
-    for (auto& pi : particles) {
-        pi.prediction = pi.position + pi.velocity * dt;
-    }
+    const int maxIterations = 10;
+    const float tolerance = 1e-5f;
 
-    // ÔÚÃ¿¸öÊ±¼ä²½ÖĞ£¬Ê×ÏÈ½øĞĞ¶à´ÎÔ¼Êø½âËã
+    // åˆå§‹é¢„æµ‹ä½ç½®
+    std::for_each(std::execution::par, particles.begin(), particles.end(), [&](Particle& p) {
+        p.prediction = p.position + p.velocity * dt;
+        });
+
     for (int iter = 0; iter < maxIterations; ++iter) {
-        bool isConverged = true;
+        std::atomic<bool> isConverged(true);
 
-        // ¼ÆËãÃ¿¸öÁ£×ÓµÄÃÜ¶È
-        for (auto& pi : particles) {
-            pi.density = computeDensityPrediction(pi, particles);
-        }
+        // å¹¶è¡Œå¯†åº¦è®¡ç®—
+        std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
+            particles[i].density = computeDensityPrediction(particles[i], particles);
+         });
 
-        // ´¦ÀíÃÜ¶ÈÔ¼Êø
-        for (auto& pi : particles) {
-            float C = computeConstraint(pi);  // ¼ÆËãÃÜ¶ÈÔ¼ÊøÎ¥·´Á¿
-            if (std::abs(C) < tolerance) continue;  // Èç¹ûÎó²î×ã¹»Ğ¡£¬¿ÉÒÔÌø¹ı¸ÃÁ£×Ó
+        // æ¯ä¸ªç²’å­çš„é¢„æµ‹ä¿®æ­£ç´¯ç§¯
+        std::vector<Vec2> deltaPrediction(particles.size(), Vec2(0, 0));
+
+        // å¹¶è¡Œå¯†åº¦çº¦æŸå¤„ç†
+        std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
+            Particle& pi = particles[i];
+            float C = computeConstraint(pi);
+            if (std::abs(C) < tolerance) return;
 
             Vec2 sumGrad2(0, 0);
-            // ¼ÆËãÃ¿¶ÔÁ£×ÓµÄÔ¼ÊøÌİ¶ÈºÍĞŞÕıÁ¿
-            for (auto& pj : particles) {
-                if (&pi == &pj) continue;
+            std::vector<Vec2> grads(particles.size(), Vec2(0, 0));
 
-                Vec2 grad = computeGradient(pi, pj);
-                sumGrad2 += grad.cwiseProduct(grad);  // Ìİ¶ÈµÄÆ½·½ºÍ
+            for (size_t j = 0; j < particles.size(); ++j) {
+                if (i == j) continue;
+                Vec2 grad = computeGradient(pi, particles[j]);
+                grads[j] = grad;
+                sumGrad2 += grad.cwiseProduct(grad);
             }
 
-            // ¼ÆËãÀ­¸ñÀÊÈÕ³Ë×Ó ¦Ë
-            float lambda = C / (sumGrad2.length() + compliance);  // ¼ÆËã ¦Ë
+            float lambda = -C / (sumGrad2.length() + compliance / (dt * dt));
 
-            // ¸üĞÂÁ£×ÓµÄÎ»ÖÃ
-            for (auto& pj : particles) {
-                if (&pi == &pj) continue;
-
-                Vec2 grad = computeGradient(pi, pj);
-                pj.prediction += lambda * grad;  // µ÷ÕûÎ»ÖÃ£¨Ê¹ÓÃÔ¤²âÎ»ÖÃ½øĞĞĞŞÕı£©
+            for (size_t j = 0; j < particles.size(); ++j) {
+                if (i == j) continue;
+                deltaPrediction[j] += lambda * grads[j];
             }
+            isConverged = false;
+            });
 
-            // Èç¹ûÔ¼ÊøÃ»ÓĞÊÕÁ²£¬Ôò±ê¼ÇÎªÎ´ÊÕÁ²
-            if (std::abs(C) > tolerance) {
-                isConverged = false;
+        // å¹¶è¡Œè¡¨é¢å¼ åŠ›çº¦æŸ
+        std::vector<Vec2> deltaSurface(particles.size(), Vec2(0, 0));
+        std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
+            Particle& pi = particles[i];
+            for (size_t j = 0; j < particles.size(); ++j) {
+                if (i == j) continue;
+                float C = computeSurfaceTensionConstraint(pi, particles[j], smoothingRadius);
+                if (std::abs(C) < tolerance) continue;
+                Vec2 grad = computeSurfaceTensionGradient(pi, particles[j]);
+                deltaSurface[i] += grad * C * compliance;
+                deltaSurface[j] -= grad * C * compliance;
             }
-        }
+            });
 
-        // ´¦Àí±íÃæÕÅÁ¦Ô¼Êø
-        for (auto& pi : particles) {
-            for (auto& pj : particles) {
-                if (&pi == &pj) continue;
-
-                float C_surface = computeSurfaceTensionConstraint(pi, pj, smoothingRadius);
-                if (std::abs(C_surface) < tolerance) continue;  // Èç¹ûÎó²î×ã¹»Ğ¡£¬¿ÉÒÔÌø¹ı¸ÃÁ£×Ó
-
-                Vec2 grad_surface = computeSurfaceTensionGradient(pi, pj);
-                pi.prediction += grad_surface * C_surface * compliance;  // ĞŞÕıÎ»ÖÃ
+        // å¹¶è¡Œç²˜æ€§çº¦æŸ
+        std::vector<Vec2> deltaViscosity(particles.size(), Vec2(0, 0));
+        std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
+            Particle& pi = particles[i];
+            for (size_t j = 0; j < particles.size(); ++j) {
+                if (i == j) continue;
+                float C = computeViscosityConstraint(pi, particles[j]);
+                if (std::abs(C) < tolerance) continue;
+                Vec2 grad = computeViscosityGradient(pi, particles[j]);
+                deltaViscosity[i] += grad * C * compliance;
+				deltaViscosity[j] -= grad * C * compliance;
             }
-        }
+            });
 
-        // ´¦ÀíÕ³ĞÔÔ¼Êø
-        for (auto& pi : particles) {
-            for (auto& pj : particles) {
-                if (&pi == &pj) continue;
+        // ç»Ÿä¸€åº”ç”¨ä½ç½®ä¿®æ­£
+        std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
+            particles[i].prediction += deltaPrediction[i] + deltaSurface[i] + deltaViscosity[i];
+            });
 
-                float C_viscosity = computeViscosityConstraint(pi, pj);
-                if (std::abs(C_viscosity) < tolerance) continue;  // Èç¹ûÎó²î×ã¹»Ğ¡£¬¿ÉÒÔÌø¹ı¸ÃÁ£×Ó
-
-                Vec2 grad_viscosity = computeViscosityGradient(pi, pj);
-                pi.prediction += grad_viscosity * C_viscosity * compliance;  // ĞŞÕıÎ»ÖÃ
-            }
-        }
-
-        // Èç¹ûËùÓĞÁ£×ÓµÄÔ¼ÊøÒÑ¾­Âú×ã£¬ÔòÌáÇ°ÍË³ö
-        if (isConverged) {
-            break;
-        }
+        if (isConverged) break;
     }
 
-    // µÚ¶ş´ÎÔ¤²â£º»ùÓÚÔ¼ÊøĞŞÕıºóµÄÔ¤²âÎ»ÖÃ¸üĞÂÊµ¼ÊÎ»ÖÃ
-    for (auto& pi : particles) {
-        applyBoundaryConstraint(pi, boundaryMin, boundaryMax, 0.9);
+    // å¹¶è¡Œè¾¹ç•Œçº¦æŸä¸é€Ÿåº¦æ›´æ–°
+    std::for_each(std::execution::par, particles.begin(), particles.end(), [&](Particle& pi) {
+        applyBoundaryConstraint(pi, boundaryMin, boundaryMax, 1.0f);
 
         Vec2 newVelocity = (pi.prediction - pi.position) / dt;
-
-        // ÏŞÖÆ×î´óËÙ¶È£¬·ÀÖ¹Ë²Ê±Ìø³ö
         const float maxSpeed = 500.0f;
+
         if (newVelocity.length() > maxSpeed)
             newVelocity = newVelocity.normalize() * maxSpeed;
 
         pi.velocity = newVelocity;
         pi.position = pi.prediction;
-    }
+        });
 }
 float XPBDConstraint::computeDensityPrediction(const Particle& pi, const std::vector<Particle>& particles) {
     float density = 0.0f;
     for (const auto& pj : particles) {
         float dist = (pi.prediction - pj.prediction).length();
-        if (dist < smoothingRadius) {
-            // ³£ÓÃ Poly6 ºËº¯Êı
+        if (dist < smoothingRadius) {//poly6
             float term = smoothingRadius * smoothingRadius - dist * dist;
             density += (315.0f / (64.0f * M_PI * pow(smoothingRadius, 9))) * term * term * term;
         }

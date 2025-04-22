@@ -27,6 +27,8 @@ void Boundary::ResolveCollisions(Vec2& velocity, Vec2& position, float damping )
         py = height - margin;
         if (vy> 0) vy *= -damping;
     }
+	position = Vec2(px, py);
+	velocity = Vec2(vx, vy);
 }
 
 void Boundary::drawBoundary(ConsoleBuffer& console)

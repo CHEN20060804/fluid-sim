@@ -10,11 +10,11 @@
 class SPHSolver {
 public:
     // 模拟参数
-	SPHSolver(std::vector<Particle>& particles) :particles(particles),smoothingRadius(0.1f), viscosity(0.1f), surfaceTension(0.0728f), restDensity(1000.0f) {}
-    float smoothingRadius = 3.0f;
-    float viscosity = 0.1f;
-    float surfaceTension = 0.0728f;
-    float restDensity = 1.0f;
+	SPHSolver(std::vector<Particle>& particles) :particles(particles),smoothingRadius(8.0f), viscosity(0.1f), surfaceTension(0.0728f), restDensity(1000.0f) {}
+    float smoothingRadius;
+    float viscosity;
+    float surfaceTension;
+    float restDensity;
 
     // 粒子集合和网格
     std::vector<Particle>& particles;

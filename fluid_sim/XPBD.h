@@ -4,9 +4,9 @@
 
 class XPBDConstraint {
 public:
-	float compliance = 0.0001f;
-	float restDensity = 10000.0f;
-	float smoothingRadius = 3.0f;
+	float compliance = 0.001f;
+	float restDensity = 100000.0f;
+	float smoothingRadius = 8.0f;
 	float boundary = -1.0f;
 
 	void solve(std::vector<Particle>& particles, float dt);

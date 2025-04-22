@@ -10,8 +10,9 @@
 #include <fstream>
 #include "XPBD.h"
 #include <random>
-const int gravity = 10;
+const int gravity = 20;
 #include <random>
+
 
 void generateRandomParticles(std::vector<Particle>& particles, int count, float xMin, float xMax, float yMin, float yMax) {
     std::random_device rd;
@@ -23,14 +24,9 @@ void generateRandomParticles(std::vector<Particle>& particles, int count, float 
         float x = distX(gen);
         float y = distY(gen);
         particles.emplace_back(Particle(Vec2(x, y)));
-        
-    }
-    SPHSolver sphSolver(particles);
-    for (int i = 0; i < particles.size(); i++)
-    {
-        particles[i].density = sphSolver.computeDensity(particles[i], particles);
     }
 }
+
 
 
 int main() {
@@ -38,22 +34,22 @@ int main() {
     ConsoleBuffer consoleBuffer;
     Boundary boundary;
     std::vector<Particle> particles;
-	generateRandomParticles(particles, 200, 50, 200, 50, 200);
-	
+	generateRandomParticles(particles, 800, 50, 350, 50, 350);
+    SPHSolver sphSolver(particles);
 	
 	ParticleGrid::getInstance().init(particles);
 	
-	XPBDConstraint xpbdConstraint;
-	xpbdConstraint.smoothingRadius = 10.0f;
-	xpbdConstraint.restDensity = 100.0f;
-	xpbdConstraint.compliance = 0.001f;
+	//XPBDConstraint xpbdConstraint;
+	//xpbdConstraint.smoothingRadius = 8.0f;
+	//xpbdConstraint.restDensity = 500.0f;
+	//xpbdConstraint.compliance = 0.0001f;
 
 
     while (true) {
         consoleBuffer.Clear();
         boundary.drawBoundary(consoleBuffer);
-		/*sphSolver.simulateStep(0.1f);*/
-		xpbdConstraint.solve(particles, 0.01f);
+		sphSolver.simulateStep(0.1f);
+		//xpbdConstraint.solve(particles, 0.01f);
 		for (int i = 0; i < particles.size(); i++) {
             int x = static_cast<int>(std::round(particles[i].position.getX()));
             int y = static_cast<int>(std::round(particles[i].position.getY()));

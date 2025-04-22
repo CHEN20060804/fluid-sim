@@ -1,3 +1,7 @@
+#ifndef DEBUG
+#define DEBUG
+
+
 #include "utility.h"
 #include "ConsoleBuffer.h"
 class Boundary {
@@ -12,4 +16,5 @@ public:
 		position = Vec2(width / 2, height / 2);
 	}
 	void drawBoundary(ConsoleBuffer& console);
-};
+}; 
+#endif // DEBUG

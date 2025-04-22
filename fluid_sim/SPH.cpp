@@ -1,4 +1,4 @@
-#include "SPH.h"
+ï»¿#include "SPH.h"
 #include "Integrator.h"
 #include <fstream>
 const int gravity = 10;
@@ -9,31 +9,36 @@ float SPHSolver::poly6(float r, float h)
 	return (315.0f / (64.0f * M_PI * pow(h, 9))) * hr2 * hr2 * hr2;
 }
 
-float SPHSolver::computeDensity(const Particle& pi, const std::vector<Particle>& particles)//¼ÆËãÃÜ¶È
+float SPHSolver::computeDensity(const Particle& pi, const std::vector<Particle>& particles)//è®¡ç®—å¯†åº¦
 {
 	float density = 0.0f;
 	for (const Particle& pj : particles) {
 		Vec2 r = pi.prediction - pj.prediction;
 		float dist = r.length();
 		if (dist < smoothingRadius)
-			density +=poly6(dist, smoothingRadius);//ÖÊÁ¿Îª1
+			density +=poly6(dist, smoothingRadius);//è´¨é‡ä¸º1
 	}
 	return density;
 }
-
 float SPHSolver::computeEveryPressure(float density)
 {
-	float stiffness = 3.0f;
-	return stiffness * std::max(0.0f,(density - restDensity));
-}
+	// æ”¹ç”¨ Tait æ–¹ç¨‹æ¥è®¡ç®—å‹åŠ›
+	const float stiffness = 2000.0f;  // å¯è°ƒï¼šè¶Šå¤§æ°´è¶Šâ€œç¡¬â€
+	const float gamma = 7.0f;         // é€šå¸¸å– 7ï¼Œå¯¹æ°´åˆç†
+	const float eps = 1e-5f;
 
+	if (density < eps)
+		return 0.0f;
+
+	return stiffness * (pow(density / restDensity, gamma) - 1.0f);
+}
 Vec2 SPHSolver::computePressureForce(const Particle& pi, const std::vector<Particle>& particles)
 {
 	Vec2 totalForce(0.0f, 0.0f);
 
 	for (const Particle& pj : particles) 
 	{
-		if (&pi == &pj) continue; // ²»ºÍ×Ô¼ºËãÁ¦
+		if (&pi == &pj) continue; // ä¸å’Œè‡ªå·±ç®—åŠ›
 
 		Vec2 r = pi.prediction - pj.prediction;
 		float dist = r.length();
@@ -42,7 +47,7 @@ Vec2 SPHSolver::computePressureForce(const Particle& pi, const std::vector<Parti
 		float pij = (pi.pressure + pj.pressure) / 2.0f;
 		float grad = spikyGradient(dist, smoothingRadius);
 
-		float pjDensity = std::max(pj.density, 0.0001f);
+		float pjDensity = max(pj.density, 0.0001f);
 		Vec2 force = - pij / pjDensity * grad * r.normalize();
 		totalForce += force;
 	}
@@ -74,30 +79,36 @@ Vec2 SPHSolver::viscosityForce(const Particle& pi, const std::vector<Particle>& 
 
 	return force;
 }
-Vec2 SPHSolver::surfaceTensionForce(const Particle& pi, const std::vector<Particle>& pj)
+Vec2 SPHSolver::surfaceTensionForce(const Particle& pi, const std::vector<Particle>& neighbors)
 {
-	for (int i = 0; i < pj.size(); i++)
+	Vec2 totalForce(0.0f, 0.0f);
+
+	for (const Particle& pj : neighbors)
 	{
-		if (pi.position == pj[i].position) continue;
+		if (pi.position == pj.position) continue;
 
-		Vec2 r = pi.position - pj[i].position;
+		Vec2 r = pi.position - pj.position;
 		float dist = r.length();
-		if (dist <= 0.00001f || dist > smoothingRadius) return Vec2();//¾àÀë¹ıĞ¡ÊÓÎªÖØºÏ
 
-		return -surfaceTension * spiky(dist, smoothingRadius) * r.normalize();
+		if (dist <= 0.00001f || dist > smoothingRadius) continue;
+
+		// è¡¨é¢å¼ åŠ›åŠ›å…¬å¼: -Ïƒ * W(r, h) * rÌ‚
+		totalForce += -surfaceTension * spiky(dist, smoothingRadius) * r.normalize();
 	}
-	}
+
+	return totalForce;
+}
 	
 void SPHSolver::simulateStep(float delteTime)
 {
 	std::vector<size_t> indices(particles.size());
-	std::iota(indices.begin(), indices.end(), 0);  // Ìî³äÎª 0, 1, 2, ..., N-1
+	std::iota(indices.begin(), indices.end(), 0);  // å¡«å……ä¸º 0, 1, 2, ..., N-1
 
 	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
 		Particle& pi = particles[i];
 		pi.force = Vec2(0.0f, 0.0f);
-		pi.velocity += Vec2(0, 1) * gravity * delteTime;// ÖØÖÃÁ¦
-		pi.prediction = pi.position + pi.velocity * delteTime;//Ä¿Ç°²âÊÔ£¬ÔİÊ±¸ÄÎªposition
+		pi.velocity += Vec2(0, 1) * gravity * delteTime;// é‡ç½®åŠ›
+		pi.prediction = pi.position + pi.velocity * delteTime;//ç›®å‰æµ‹è¯•ï¼Œæš‚æ—¶æ”¹ä¸ºposition
 		std::wofstream log("prrdiction.txt", std::ios::app);
 		log << L"particle[" << i << L"] prediction = " << pi.prediction.getX() << " " << pi.prediction.getY() << L"\n";
 		});
@@ -115,10 +126,10 @@ void SPHSolver::simulateStep(float delteTime)
 	});
 
 	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
-		    //std::vector<Particle> other = ParticleGrid::getInstance().ForeachPointWithinRadius(particles[i].prediction, this->smoothingRadius);
-			//particles[i].force += viscosityForce(particles[i], other);
+		  //  std::vector<Particle> other = ParticleGrid::getInstance().ForeachPointWithinRadius(particles[i].prediction, this->smoothingRadius);
+			particles[i].force += viscosityForce(particles[i], particles);
 			particles[i].pressure = computeEveryPressure(particles[i].density);
-			std::wofstream log("debug_log.txt", std::ios::app); // ×·¼ÓĞ´Èë
+			std::wofstream log("debug_log.txt", std::ios::app); // è¿½åŠ å†™å…¥
 			
 			    
 			particles[i].force += computePressureForce(particles[i], particles);
@@ -127,7 +138,7 @@ void SPHSolver::simulateStep(float delteTime)
 				<< particles[i].force.getX() << L" "
 				<< particles[i].force.getY() << L" "
 				<< particles[i].density << L"\n ";
-			//particles[i].force += surfaceTensionForce(particles[i], other);
+			particles[i].force += surfaceTensionForce(particles[i], particles);
 		});
 
 	std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
