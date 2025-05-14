@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utility.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ConsoleBuffer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Particle.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Integrator.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SPH.h">
@@ -36,7 +27,7 @@
     <ClInclude Include="ParticleGrid.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XPBD.h">
+    <ClInclude Include="Manager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -45,9 +36,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Integrator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SPH.cpp">
@@ -59,16 +47,25 @@
     <ClCompile Include="ParticleGrid.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XPBD.cpp">
+    <ClCompile Include="Manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sort.cuh">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="Sort.cu">
+    <CudaCompile Include="pbf.cu">
       <Filter>源文件</Filter>
-    </None>
+    </CudaCompile>
+    <CudaCompile Include="pbf.cuh">
+      <Filter>头文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="utility.h">
+      <Filter>头文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Particle.h">
+      <Filter>头文件</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -120,6 +120,8 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +129,10 @@
       <AdditionalLibraryDirectories>\$(CUDA_PATH_V12_6)\lib$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>cublas.lib;cuda.lib;cudadevrt.lib;cudart.lib;cudart_static.lib;cufft.lib;cufftw.lib;curand.lib;cusolver.lib;cusparse.lib;nppc.lib;nppial.lib;nppicc.lib;nppidei.lib;nppif.lib;nppig.lib;nppim.lib;nppist.lib;nppisu.lib;nppitc.lib;npps.lib;nvblas.lib;nvml.lib;nvrtc.lib;OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <AdditionalOptions>-allow-unsupported-compiler %(AdditionalOptions)</AdditionalOptions>
+      <CodeGeneration>compute_89,sm_89;%(CodeGeneration)</CodeGeneration>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -150,32 +156,32 @@
   <ItemGroup>
     <ClInclude Include="Boundary.h" />
     <ClInclude Include="ConsoleBuffer.h" />
-    <ClInclude Include="Integrator.h" />
-    <ClInclude Include="Particle.h">
+    <CudaCompile Include="Particle.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    </CudaCompile>
+    <ClInclude Include="Manager.h" />
     <ClInclude Include="ParticleGrid.h" />
+    <CudaCompile Include="pbf.cuh" />
     <ClInclude Include="SPH.h" />
-    <ClInclude Include="utility.h" />
-    <ClInclude Include="XPBD.h" />
+    <CudaCompile Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bound.cpp" />
-    <ClCompile Include="Integrator.cpp" />
+    <ClCompile Include="ConsoleBuffer.cpp" />
+    <ClCompile Include="Manager.cpp" />
     <ClCompile Include="ParticleGrid.cpp" />
     <ClCompile Include="SPH.cpp" />
     <ClCompile Include="utility.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="XPBD.cpp" />
+    <ClCompile Include="main.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Full</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Sort.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
-    <CudaCompile Include="Sort.cuh" />
+    <CudaCompile Include="pbf.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

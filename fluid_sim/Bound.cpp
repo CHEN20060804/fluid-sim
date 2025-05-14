@@ -1,48 +1,60 @@
 #include "Boundary.h"
-void Boundary::ResolveCollisions(Vec2& velocity, Vec2& position, float damping )
+void Boundary::ResolveCollisions(Particle& p, float damping)
 {
-    float px = position.getX();
-    float py = position.getY();
-	float vx = velocity.getX();
-    float vy = velocity.getY();
+    float px = p.position.getX();
+    float py = p.position.getY();
+    float vx = p.velocity.getX();
+    float vy = p.velocity.getY();
+    float r = p.radius;
+    // 碰撞标志
+    bool collided = false;
 
-    //左墙
-    if (px < margin) {
-        px = margin;
-        if (vx < 0) vx *= -damping;
+    // 左右边界
+    if (px - r < margin + 2) {
+        px = margin + r + 2;
+        vx = -vx * damping;
+        collided = true;
     }
-    // 右墙
-    else if (px> width - margin) {
-        px = width - margin;
-        if (vx > 0) vx *= -damping;
+    else if (px + r > width - margin) {
+        px = width - margin - r;
+        vx = -vx * damping;
+        collided = true;
     }
 
-    // 下墙
-    if (py < margin) {
-        py = margin;
-        if (vy < 0) vy *= -damping;
+    // 上下边界
+    if (py - r < margin + 1) {
+        py = margin + r + 1;
+        vy = -vy * damping;
+        collided = true;
     }
-    // 上墙
-    else if (py> height - margin) {
-        py = height - margin;
-        if (vy> 0) vy *= -damping;
+    else if (py + r > height - margin) {
+        py = height - margin - r;
+        vy = -vy * damping;
+        collided = true;
     }
-	position = Vec2(px, py);
-	velocity = Vec2(vx, vy);
+
+    // 可选：碰撞后给个小阻尼修正，避免剧烈反复震荡
+    if (collided) {
+        vx *= 0.95f;
+        vy *= 0.95f;
+    }
+
+    p.position = Vec2(px, py);
+    p.velocity = Vec2(vx, vy);
 }
 
 void Boundary::drawBoundary(ConsoleBuffer& console)
 {
-    for (int i = margin; i < margin + width; i++) {
-        console.DrawAt(i, margin, L'━');
-        console.DrawAt(i, margin + height, L'━');
+    for (int i = 1; i < 3 + width; i++) {
+        console.DrawAt(i, 1, L'━', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+        console.DrawAt(i, height + 5, L'━', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
     }
-    console.DrawAt(margin, margin, L'┏');
-    console.DrawAt(width + margin, margin, L'┓');
-    console.DrawAt(margin, margin + height, L'┗');
-    console.DrawAt(width + margin, margin + height, L'┛');
-    for (int i = margin + 1; i < height + margin; i++) {
-        console.DrawAt(margin, i, L'┃');
-        console.DrawAt(width + margin, i, L'┃');
+    console.DrawAt(1, 1, L'┏');
+    console.DrawAt(width + 3, 1, L'┓', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+    console.DrawAt(1, height + 5, L'┗', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+    console.DrawAt(width + 3, height + 5, L'┛', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+    for (int i = 1; i < height + 5; i++) {
+        console.DrawAt(1, i, L'┃', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+        console.DrawAt(width + 3, i, L'┃', FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
     }
 }

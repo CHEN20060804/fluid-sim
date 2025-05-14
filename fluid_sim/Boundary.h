@@ -1,20 +1,18 @@
-#ifndef DEBUG
-#define DEBUG
+#pragma once
 
-
+#define WIDTH 800.0f
+#define HEIGHT 450.0f
 #include "utility.h"
+#include "Particle.h"
 #include "ConsoleBuffer.h"
 class Boundary {
 private:
-	Vec2 position;
 	float width;
 	float height;
 	float margin;
 public:
-	void ResolveCollisions(Vec2& velocity, Vec2& position, float damping = 0.5f);
-	Boundary(float width = 350, float height = 200, float margin = 10) : width(width), height(height), margin(margin) {
-		position = Vec2(width / 2, height / 2);
+	void ResolveCollisions(Particle& p, float damping = 0.4f);
+	Boundary(float width = WIDTH, float height = HEIGHT, float margin = 1.0f) : width(width), height(height), margin(margin) {
 	}
 	void drawBoundary(ConsoleBuffer& console);
-}; 
-#endif // DEBUG
+};
