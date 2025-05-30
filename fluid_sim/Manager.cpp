@@ -170,19 +170,17 @@ void Manager::handleMouseEvents()
 {
     while (running)
     {
-        std::unique_lock<std::mutex> lock(MouseQueueMutex);
+        std::unique_lock<std::mutex> lockQ(MouseQueueMutex);
 
-        MouseEventCondition.wait(lock, [&] { return !mouseEventQueue.empty() || !running; });
+        MouseEventCondition.wait(lockQ, [&] { return !mouseEventQueue.empty() || !running; });
 
         if (!running) break;
 
         while (!mouseEventQueue.empty())
         {
-            std::unique_lock<std::mutex> lock(particlesMutex);
-
             auto [pos, eventType] = mouseEventQueue.front();
             mouseEventQueue.pop();
-            lock.unlock();
+            lockQ.unlock();
 
             Vec2 clickPos(pos.X, pos.Y);
             auto ans = ParticleGrid::getInstance().ForeachMouseWithinRadius(clickPos, 60.0f);
@@ -214,7 +212,7 @@ void Manager::handleMouseEvents()
                 }
 
             }
-            lock.lock();
+            lockQ.lock();
         }
     }
 }
