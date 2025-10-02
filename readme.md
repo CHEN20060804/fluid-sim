@@ -50,9 +50,3 @@ IDE： Visual  Studio 2022
 | 空格     | 右下角吹风机 |
 | 鼠标左键 | 吸引粒子     |
 | 鼠标右键 | 排斥粒子     |
-
-### 程序效果图
-
-![image-20250514231250188](C:\Users\37775\AppData\Roaming\Typora\typora-user-images\image-20250514231250188.png)
-
-![image-20250514231329949](C:\Users\37775\AppData\Roaming\Typora\typora-user-images\image-20250514231329949.png)
